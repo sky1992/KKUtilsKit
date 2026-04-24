@@ -1,0 +1,6 @@
+framework module KKUtilsKit {
+  umbrella header "KKUtilsKit-umbrella.h"
+
+  export *
+  module * { export * }
+}
