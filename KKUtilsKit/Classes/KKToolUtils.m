@@ -22,40 +22,39 @@
 
 + (NSString *)format_amount:(NSString *)amount {
     double doubleValue = [amount doubleValue];
-    NSInteger intValue = (NSInteger)doubleValue;
+    long long value = llround(doubleValue);
     
-    if (intValue == 0) return @"0";
-    
-    NSString *numberString = [NSString stringWithFormat:@"%ld", (long)ABS(intValue)];
-    NSInteger length = numberString.length;
-    
-    if (length <= 3) {
-        return [NSString stringWithFormat:@"%ld", (long)intValue];
+    if (value == 0) {
+        return @"0";
     }
     
+    BOOL isNegative = value < 0;
+    NSUInteger absValue = llabs(value);
+    NSString *numStr = [NSString stringWithFormat:@"%lu", (unsigned long)absValue];
     NSMutableString *result = [NSMutableString string];
-    NSInteger index = length - 1;
-    NSInteger groupCount = 0;
     
-    while (index >= 0) {
-        [result insertString:[NSString stringWithFormat:@"%C", [numberString characterAtIndex:index]] atIndex:0];
-        groupCount++;
+    NSInteger length = numStr.length;
+    NSInteger count = 0;
+    
+    for (NSInteger i = length - 1; i >= 0; i--) {
+        [result insertString:[NSString stringWithFormat:@"%C", [numStr characterAtIndex:i]] atIndex:0];
+        count++;
         
-        if (index > 0) {
-            if (groupCount == 3) {
+        if (i > 0) {
+            if (count == 3) {
                 [result insertString:@"," atIndex:0];
-                groupCount = 0;
-            } else if (groupCount == 2 && index > 1) {
+                count = 0;
+            } else if (count == 2) {
                 [result insertString:@"," atIndex:0];
-                groupCount = 0;
+                count = 0;
             }
         }
-        index--;
     }
     
-    if (intValue < 0) {
+    if (isNegative) {
         [result insertString:@"-" atIndex:0];
     }
+    
     return result;
 }
 
