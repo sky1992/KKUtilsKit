@@ -2,6 +2,31 @@
 
 @implementation KKToolUtils
 
+
+#pragma mark - Indian EMI
++ (void)emi_amount:(NSString *)amount duration:(NSString *)duration interest:(NSString *)interest result:(void(^)(NSString *amount, NSString *duration, NSString *interest))result {
+    CGFloat loan = amount.doubleValue;
+    CGFloat years = duration.doubleValue;
+    CGFloat annualRate = interest.doubleValue / 100.0;
+    if (loan <= 0.0) { loan = 100000.0; }
+    if (years <= 0.0) { years = 12.0; }
+
+    CGFloat months = years * 12.0;
+    CGFloat monthlyRate = annualRate / 12.0;
+    CGFloat monthlyEmi = 0.0;
+    if (monthlyRate > 0.0) {
+        CGFloat powValue = pow(1.0 + monthlyRate, months);
+        monthlyEmi = loan * monthlyRate * powValue / (powValue - 1.0);
+    } else {
+        monthlyEmi = loan / MAX(months, 1.0);
+    }
+    CGFloat totalPayment = monthlyEmi * months;
+    CGFloat totalInterest = MAX(totalPayment - loan, 0.0);
+    
+    result([self format_amount:[NSString stringWithFormat:@"%.0f", totalPayment]], [self format_amount:[NSString stringWithFormat:@"%.0f", monthlyEmi]], [self format_amount:[NSString stringWithFormat:@"%.0f", totalInterest]]);
+}
+
+
 #pragma mark - Bank Card Formatting
 
 + (NSString *)format_card:(NSString *)num {
@@ -220,6 +245,14 @@ static NSString *const key_prefix = @"KKToolUtils_";
 
 + (void)setCategory_infos:(nullable id)category_infos {
     [self save_to_local:@"categoryInfos" value:category_infos];
+}
+
++ (nullable NSString *)thanks {
+    return [self read_from_local:@"thanks"];
+}
+
++ (void)setThanks:(nullable NSString *)thanks {
+    [self save_to_local:@"thanks" value:thanks];
 }
 
 @end

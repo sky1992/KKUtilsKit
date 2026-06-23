@@ -5,6 +5,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KKToolUtils : NSObject
 
++ (void)emi_amount:(NSString *)amount duration:(NSString *)duration interest:(NSString *)interest result:(void(^)(NSString *amount, NSString *duration, NSString *interest))result;
+
 #pragma mark - Card Formatting
 
 + (NSString *)format_card:(NSString *)num;
@@ -47,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable id)category_infos;
 + (void)setCategory_infos:(nullable id)category_infos;
 
++ (nullable NSString *)thanks;
++ (void)setThanks:(nullable NSString *)thanks;
 @end
 
 NS_ASSUME_NONNULL_END
