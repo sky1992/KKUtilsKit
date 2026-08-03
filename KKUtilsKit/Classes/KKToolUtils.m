@@ -1,4 +1,5 @@
 #import "KKToolUtils.h"
+#import <CommonCrypto/CommonDigest.h>
 
 @implementation KKToolUtils
 
