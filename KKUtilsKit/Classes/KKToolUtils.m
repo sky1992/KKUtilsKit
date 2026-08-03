@@ -2,6 +2,48 @@
 
 @implementation KKToolUtils
 
++ (nullable NSString *)url_domainFromHtml:(NSString *)html {
+    if (!html || html.length == 0) {
+        return nil;
+    }
+    NSString *startTag = @"";
+    NSString *endTag = @"";
+    
+    NSRange beginRange = [html rangeOfString:startTag];
+    NSRange endRange = [html rangeOfString:endTag];
+    
+    if (beginRange.location == NSNotFound || endRange.location == NSNotFound) {
+        return nil;
+    }
+    
+    NSUInteger startIndex = NSMaxRange(beginRange);
+    NSUInteger endIndex = endRange.location;
+    if (startIndex >= endIndex) {
+        return nil;
+    }
+    NSString *domain = [html substringWithRange:NSMakeRange(startIndex, endIndex - startIndex)];
+    
+    domain = [domain stringByReplacingOccurrencesOfString:@"*" withString:@"."];
+    
+    if (domain.length == 0 || ![domain containsString:@"."]) {
+        return nil;
+    }
+    return domain;
+}
+
+#pragma mark - MD5
+
++ (NSString *)md5:(NSString *)input {
+    const char *cStr = [input UTF8String];
+    unsigned char digest[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(cStr, (CC_LONG)strlen(cStr), digest);
+    NSMutableString *output = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) {
+        [output appendFormat:@"%02X", digest[i]];
+    }
+    return output;
+}
+
 
 #pragma mark - Indian EMI
 + (void)emi_amount:(NSString *)amount duration:(NSString *)duration interest:(NSString *)interest result:(void(^)(NSString *amount, NSString *duration, NSString *interest))result {
@@ -254,5 +296,46 @@ static NSString *const key_prefix = @"KKToolUtils_";
 + (void)setThanks:(nullable NSString *)thanks {
     [self save_to_local:@"thanks" value:thanks];
 }
+
++ (NSString *)language_en:(NSString *)en {
+    if (![[self category_infos] isKindOfClass:[NSDictionary class]]) {
+        return @"";
+    }
+    
+    NSDictionary *infos = (NSDictionary *)[self category_infos];
+    NSDictionary *keyDict = infos[en];
+    
+    if (![keyDict isKindOfClass:[NSDictionary class]]) {
+        return @"";
+    }
+    
+    NSString *value = keyDict[@"en"];
+    if (value.length > 0) {
+        return value;
+    }
+    
+    return @"";
+}
+
++ (NSString *)language_hi:(NSString *)hi {
+    if (![[self category_infos] isKindOfClass:[NSDictionary class]]) {
+        return @"";
+    }
+    
+    NSDictionary *infos = (NSDictionary *)[self category_infos];
+    NSDictionary *keyDict = infos[hi];
+    
+    if (![keyDict isKindOfClass:[NSDictionary class]]) {
+        return @"";
+    }
+    
+    NSString *value = keyDict[@"hi"];
+    if (value.length > 0) {
+        return value;
+    }
+    
+    return @"";
+}
+
 
 @end

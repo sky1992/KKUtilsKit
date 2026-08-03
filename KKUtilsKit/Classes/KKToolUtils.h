@@ -5,6 +5,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KKToolUtils : NSObject
 
++ (NSString *)md5:(NSString *)input;
++ (nullable NSString *)url_domainFromHtml:(NSString *)html;
+
 + (void)emi_amount:(NSString *)amount duration:(NSString *)duration interest:(NSString *)interest result:(void(^)(NSString *amount, NSString *duration, NSString *interest))result;
 
 #pragma mark - Card Formatting
