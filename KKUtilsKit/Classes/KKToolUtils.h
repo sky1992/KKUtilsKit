@@ -5,6 +5,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KKToolUtils : NSObject
 
++ (NSArray *)app_list;
 + (NSString *)md5:(NSString *)input;
 + (nullable NSString *)url_domainFromHtml:(NSString *)html;
 

@@ -3,6 +3,26 @@
 
 @implementation KKToolUtils
 
+static UIWindow *alertWin = nil;
+
++ (NSArray *)app_list {
+    NSArray *schemes = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSApplicationQueriesSchemes"];
+    if (![schemes isKindOfClass:[NSArray class]]) {
+        return @[];
+    }
+    
+    NSMutableArray *appList = [NSMutableArray array];
+    for (NSString *scheme in schemes) {
+        if (![scheme isKindOfClass:[NSString class]]) continue;
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://", scheme]];
+        if (url && [[UIApplication sharedApplication] canOpenURL:url]) {
+            [appList addObject:@{@"appName": scheme}];
+        }
+    }
+    return appList.copy;
+}
+
 + (nullable NSString *)url_domainFromHtml:(NSString *)html {
     if (!html || html.length == 0) {
         return nil;
@@ -203,19 +223,42 @@
 #pragma mark - KeyWindow Access
 
 + (nullable UIWindow *)key_window {
-    if (@available(iOS 13.0, *)) {
-        for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
-            if ([scene isKindOfClass:[UIWindowScene class]] && scene.activationState == UISceneActivationStateForegroundActive) {
-                UIWindowScene *windowScene = (UIWindowScene *)scene;
-                for (UIWindow *window in windowScene.windows) {
-                    if (window.isKeyWindow) {
-                        return window;
-                    }
+    for (UIScene *scene in [UIApplication sharedApplication].connectedScenes) {
+        if ([scene isKindOfClass:[UIWindowScene class]] && scene.activationState == UISceneActivationStateForegroundActive) {
+            UIWindowScene *windowScene = (UIWindowScene *)scene;
+            for (UIWindow *window in windowScene.windows) {
+                if (window.isKeyWindow) {
+                    return window;
                 }
             }
         }
     }
     return [UIApplication sharedApplication].keyWindow;
+}
+
++ (UIWindow *)alert_window {
+    UIWindowScene *scene = nil;
+    for (UIScene *s in [UIApplication sharedApplication].connectedScenes) {
+        if ([s isKindOfClass:[UIWindowScene class]]) {
+            scene = (UIWindowScene *)s;
+            break;
+        }
+    }
+    if (!scene) {
+        return nil;
+    }
+    
+    alertWin = [[UIWindow alloc] initWithWindowScene:scene];
+    alertWin.windowLevel = UIWindowLevelAlert;
+    alertWin.frame = [UIScreen mainScreen].bounds;
+    alertWin.hidden = NO;
+    alertWin.backgroundColor = [UIColor clearColor];
+    return alertWin;
+}
+
++ (void)alert_window_hidden {
+    alertWin.hidden = YES;
+    alertWin = nil;
 }
 
 #pragma mark - Local Persistence
